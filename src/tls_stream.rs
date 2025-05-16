@@ -178,7 +178,9 @@ impl TlsStream {
         let socket = Socket::create(family, SocketType::Stream, SocketProtocol::Tls1v2).await?;
         socket.set_option(SocketOption::TlsPeerVerify(peer_verify.as_integer()))?;
         socket.set_option(SocketOption::TlsSessionCache(resume_sessions as _))?;
-        socket.set_option(SocketOption::TlsTagList(security_tags))?;
+        if !security_tags.is_empty() {
+            socket.set_option(SocketOption::TlsTagList(security_tags))?;
+        }
         socket.set_option(SocketOption::TlsHostName(hostname))?;
         if let Some(ciphers) = ciphers {
             socket.set_option(SocketOption::TlsCipherSuiteList(unsafe {
